@@ -12,6 +12,11 @@ Bootstrap5(app)
 def home():
     return render_template("index.html")
 
+#TODO Selection Page
+@app.route("/select")
+def select_repo():
+    return render_template("select_repo.html")
+
 #TODO Results page
 @app.route("/results")
 def show_results():
