@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% include "header.html" %}
+<div class="container-fluid">
+    <h2>Let's get started!</h2>
+    <h3> Guidelines:</h3>
 
-</body>
-</html>
+    <h5>For local repositories, include the full path, for example:</h5>
+    <p>C:/Users/Owner/Repositories/Repo_name</p>
+
+    <h5> For remote repositories, include the full URL, for example:</h5>
+    <p>https://github.com/username/Repo_name or https://github.com/username/Repo_name.git</p>
+    <label for="repositoryURL" class="form-label">Enter repository URL in the box below:
+    </label>
+    <p></p>
+    <textarea class="form-control accent-color" id="repositoryURL" rows="3"></textarea>
+    <a href="{{ url_for('show_results') }}" class="btn btn-primary btn-med px-4 me-sm-3 accent-color button-border">Analyze
+        Repository</a>
+</div>
+
+<div>
+
+</div>
+{% include "footer.html" %}

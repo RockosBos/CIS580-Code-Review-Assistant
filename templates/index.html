@@ -6,7 +6,7 @@
         Select a repository to get started! </p>
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-5">
             <!--TODO link to selection page -->
-            <button type="button" class="btn btn-primary btn-lg px-4 me-sm-3 accent-color button-border">Select Repository </button>
+            <a href = "{{ url_for('select_repo') }}"class="btn btn-primary btn-lg px-4 me-sm-3 accent-color button-border">Select Repository </a>
 <!--        <button type="button" class="btn btn-outline-secondary btn-lg px-4">Secondary</button>-->
         </div>
     </div>
@@ -16,12 +16,5 @@
                                          alt="Example image" width="700" height="500" loading="lazy"></div>
     </div>
 </div>
-
-<script src="/docs/5.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        class="astro-vvvwv3sm"></script>
-
-{{ bootstrap.load_js() }}
-
 
 {% include "footer.html" %}
