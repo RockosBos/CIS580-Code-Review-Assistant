@@ -12,6 +12,26 @@ app = Flask(__name__)
 #initializ Bootstrap
 Bootstrap5(app)
 
+#TODO (time permitting)
+def validate_repository():
+    pass
+
+
+def process_repository():
+    retrieve_repository()
+
+
+def retrieve_repository(repository_url):
+    #TODO
+    pass
+
+def prep_commit_messages():
+    #TODO figure out best prep for the LLM prompt
+    pass
+
+def classify_repository():
+    pass
+
 #TODO Home Route
 @app.route('/')
 def home():
@@ -21,6 +41,8 @@ def home():
 @app.route('/select')
 def select_repo():
     return render_template('select_repo.html')
+
+#TODO Validate Repo
 
 #TODO Results page
 @app.route('/results', methods = ['GET', 'POST'])

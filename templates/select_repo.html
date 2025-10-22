@@ -8,8 +8,9 @@
 
     <h5> For remote repositories, include the full URL, for example:</h5>
     <p>https://github.com/username/Repo_name or https://github.com/username/Repo_name.git</p>
-    <form method='POST' action="{{ url_for('show_results') }}">
+    <form method='POST' action="{{ url_for('select_repo') }}" >
         <label for='repository_url' class='form-label'>Enter repository URL in the box below: </label>
+        <!--TODO - add error handling for incorrect URLs -->
         <textarea class='form-control accent-color' name='repository_url' id='repository_url' rows='3'></textarea>
         <button type='submit' class='btn btn-primary btn-med px-4 me-sm-3 accent-color button-border'>Analyze
             Repository</button>
