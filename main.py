@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, flash, get_flashed_messages, url_for
 from flask_bootstrap import Bootstrap5
 
-import ollama
 import os
 from werkzeug.utils import redirect
 
 from llm_interface import LLMInterface
 from repository_interface import RepoInterface
+from statisical_interface import StatisticsInterface
 
 #safety measure to minimize PyDriller errors during processing
 os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
@@ -25,6 +25,9 @@ repository_interface = RepoInterface()
 
 #initialize llm interfacing
 llm_interface = LLMInterface()
+
+#initialize llm interfacing
+statistical_interface = StatisticsInterface()
 
 #TODO Home Route
 @app.route('/')
@@ -45,7 +48,8 @@ def select_repo():
         else:
             print('It worked!')
             commits = repository_interface.retrieve_repository(repo_url)
-            results = llm_interface.process_commits(commits)
+            classification_results = llm_interface.process_commits(commits)
+            statistical_results = statistical_interface.analyze_results(classification_results)
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
