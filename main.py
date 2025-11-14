@@ -47,9 +47,10 @@ def select_repo():
             return redirect(url_for('select_repo'))
         else:
             print('It worked!')
+            
             commits = repository_interface.retrieve_repository(repo_url)
             classification_results = llm_interface.process_commits(commits)
-            statistical_results = statistical_interface.analyze_results(classification_results)
+            #statistical_results = statistical_interface.analyze_results(classification_results)
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
@@ -57,6 +58,7 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
+    repo = request.args.get("repository_url")
     return render_template('show_results.html')
 
 # 'C:/Users/Owner/PycharmProjects/CIS580-Code-Review-Assistant'
