@@ -41,5 +41,5 @@ class LLMInterface:
     def prompt_llama(self, commit):
         prompt = self.base_prompt + commit
         response = ollama.chat(model=self.model, messages=[{'role': self.role, 'content': prompt}])
-        print(response, "\n")
+        #print(response, "\n")
         return response
