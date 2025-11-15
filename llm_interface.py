@@ -1,3 +1,5 @@
+import json
+
 import ollama
 
 class LLMInterface:
@@ -35,11 +37,17 @@ class LLMInterface:
 
     def process_commits(self, commits):
         for commit in commits:
-            commit['classification'] = self.prompt_llama(commit['message'])
+            response = self.prompt_llama(commit['message']).message.content
+            classification = json.loads(response)
 
+            commit['classification'] = classification['classification']
+            commit['confidence'] = classification['confidence']
+            commit['explanation'] = classification['explanation']
+            print(commit['classification'], commit['confidence'], commit['explanation'])
+        return commits
 
     def prompt_llama(self, commit):
         prompt = self.base_prompt + commit
         response = ollama.chat(model=self.model, messages=[{'role': self.role, 'content': prompt}])
-        print(response, "\n")
+
         return response

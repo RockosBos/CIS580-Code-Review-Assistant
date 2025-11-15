@@ -39,7 +39,6 @@ def home():
 def select_repo():
     if request.method == 'POST':
         # TODO - ideally validate REPO HERE if time permits
-        flash('Repository processing is underway, please do not exit or refresh the page.')
         repo_url = request.form.get('repository_url')
         print(f' Select_repo: {repo_url}')
         if repo_url is None:
@@ -50,6 +49,7 @@ def select_repo():
             commits = repository_interface.retrieve_repository(repo_url)
             classification_results = llm_interface.process_commits(commits)
             statistical_results = statistical_interface.analyze_results(classification_results)
+
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
