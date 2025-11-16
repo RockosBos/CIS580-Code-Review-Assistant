@@ -1,4 +1,5 @@
 import json
+import re
 
 import ollama
 
@@ -38,12 +39,39 @@ class LLMInterface:
     def process_commits(self, commits):
         for commit in commits:
             response = self.prompt_llama(commit['message']).message.content
-            classification = json.loads(response)
+            # print(response)
 
-            commit['classification'] = classification['classification']
-            commit['confidence'] = classification['confidence']
-            commit['explanation'] = classification['explanation']
+            #set empty string to account for instances of LLM not classifying
+            if response is None:
+                response = ''
+
+            #response should be loadable as a json
+            try:
+                classification = json.loads(response)
+
+            #if results don't load by default search for JSON format within the response instead
+            except json.JSONDecodeError:
+                json_text = re.search(r'\{.*}', response, flags = re.S)
+                if not json_text:
+                    classification = {}
+                else:
+                    try:
+                        classification = json.loads(json_text.group(0))
+                    except json.JSONDecodeError:
+                        classification = {}
+            if not isinstance(classification, dict):
+                classification = {}
+
+            #use default values in instances where classification is inaccessible
+            label = str(classification.get('classification', 'not_labeled')).strip()
+            confidence = classification.get('confidence', 0.0)
+            explanation = classification.get('explanation', '')
+
+            commit['classification'] = label
+            commit['confidence'] = confidence
+            commit['explanation'] = explanation
             print(commit['classification'], commit['confidence'], commit['explanation'])
+
         return commits
 
     def prompt_llama(self, commit):

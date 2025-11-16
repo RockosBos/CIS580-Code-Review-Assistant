@@ -59,7 +59,5 @@ def select_repo():
 def show_results():
     return render_template('show_results.html')
 
-# 'C:/Users/Owner/PycharmProjects/CIS580-Code-Review-Assistant'
-
 if __name__ == '__main__':
     app.run(debug = True, port = 8080)
