@@ -1,3 +1,6 @@
+import json
+import re
+
 import ollama
 
 class LLMInterface:
@@ -35,11 +38,43 @@ class LLMInterface:
 
     def process_commits(self, commits):
         for commit in commits:
-            commit['classification'] = self.prompt_llama(commit['message'])
+            response = self.prompt_llama(commit['message']).message.content
+            # print(response)
 
+            #set empty string to account for instances of LLM not classifying
+            if response is None:
+                response = ''
+
+            #response should be loadable as a json
+            try:
+                classification = json.loads(response)
+
+            #if results don't load by default search for JSON format within the response instead
+            except json.JSONDecodeError:
+                json_text = re.search(r'\{.*}', response, flags = re.S)
+                if not json_text:
+                    classification = {}
+                else:
+                    try:
+                        classification = json.loads(json_text.group(0))
+                    except json.JSONDecodeError:
+                        classification = {}
+            if not isinstance(classification, dict):
+                classification = {}
+
+            #use default values in instances where classification is inaccessible
+            label = str(classification.get('classification', 'not_labeled')).strip()
+            confidence = classification.get('confidence', 0.0)
+            explanation = classification.get('explanation', '')
+
+            commit['classification'] = label
+            commit['confidence'] = confidence
+            commit['explanation'] = explanation
+            print(commit['classification'], commit['confidence'], commit['explanation'])
+
+        return commits
 
     def prompt_llama(self, commit):
         prompt = self.base_prompt + commit
         response = ollama.chat(model=self.model, messages=[{'role': self.role, 'content': prompt}])
-        #print(response, "\n")
         return response

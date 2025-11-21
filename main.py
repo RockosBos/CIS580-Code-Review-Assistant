@@ -40,7 +40,6 @@ def home():
 def select_repo():
     if request.method == 'POST':
         # TODO - ideally validate REPO HERE if time permits
-        flash('Repository processing is underway, please do not exit or refresh the page.')
         repo_url = request.form.get('repository_url')
         print(f' Select_repo: {repo_url}')
         if repo_url is None:
@@ -51,9 +50,8 @@ def select_repo():
             
             commits = repository_interface.retrieve_repository(repo_url)
             classification_results = llm_interface.process_commits(commits)
-            Results.loadResults(Results, classification_results)
-            print(classification_results)
-            #statistical_results = statistical_interface.analyze_results(classification_results)
+            statistical_results = statistical_interface.analyze_results(classification_results)
+
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
@@ -63,8 +61,6 @@ def select_repo():
 def show_results():
     print(Results.result)
     return render_template('show_results.html', resultData=Results.result)
-
-# 'C:/Users/Owner/PycharmProjects/CIS580-Code-Review-Assistant'
 
 if __name__ == '__main__':
     app.run(debug = True, port = 8080)
