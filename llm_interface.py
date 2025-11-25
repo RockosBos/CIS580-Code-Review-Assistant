@@ -2,9 +2,13 @@ import json
 import re
 
 import ollama
+import pandas as pd
+
+from datetime import datetime
 
 class LLMInterface:
     def __init__(self):
+        self.max_retries = 3
         self.base_prompt = """
         You are an expert software engineering assistant that classifies commit messages from a Git repository.  
         For each commit message, you will determine whether that commit message is a bug fix or not a bug fix. You can refer to the follow keywords to help identify bugs:  
@@ -38,39 +42,73 @@ class LLMInterface:
 
     def process_commits(self, commits):
         for commit in commits:
-            response = self.prompt_llama(commit['message']).message.content
-            # print(response)
 
-            #set empty string to account for instances of LLM not classifying
-            if response is None:
-                response = ''
+            #default/base values
+            label = ''
+            confidence = 0.0
+            explanation = ''
 
-            #response should be loadable as a json
-            try:
-                classification = json.loads(response)
+            for i in range(self.max_retries):
+                if i > 0:
+                    print("Retrying due to invalid response.")
 
-            #if results don't load by default search for JSON format within the response instead
-            except json.JSONDecodeError:
-                json_text = re.search(r'\{.*}', response, flags = re.S)
-                if not json_text:
-                    classification = {}
-                else:
-                    try:
-                        classification = json.loads(json_text.group(0))
-                    except json.JSONDecodeError:
+                response = self.prompt_llama(commit['message']).message.content
+                # print(response)
+
+                #troubleshooting response string to evaluate message format and handling of broken responses
+                # response = ''''"classification": "not bug fix", "confidence": 1.0,
+                #  "explanation": "commit message introduces a new file, which is not related to bug fixes"}'''
+
+
+                #set empty string to account for instances of LLM not classifying
+                if response is None:
+                    response = ''
+
+                #response should be loadable as a json
+                try:
+                    classification = json.loads(response)
+
+                #if results don't load by default search for JSON format within the response instead
+                except json.JSONDecodeError:
+                    json_text = re.search(r'\{.*}', response, flags = re.S)
+                    if not json_text:
                         classification = {}
-            if not isinstance(classification, dict):
-                classification = {}
+                    else:
+                        try:
+                            classification = json.loads(json_text.group(0))
+                        except json.JSONDecodeError:
+                            classification = {}
 
-            #use default values in instances where classification is inaccessible
-            label = str(classification.get('classification', 'not_labeled')).strip()
-            confidence = classification.get('confidence', 0.0)
-            explanation = classification.get('explanation', '')
+                #if the LLM responses drops a non dict item then format it or provide empty dict to avoid crash
+                if not isinstance(classification, dict):
+                    if isinstance(classification, list):
+                        if classification and isinstance(classification[0], dict):
+                            classification = classification[0]
+                    else:
+                        classification = {}
+
+                #use default values in instances where classification is inaccessible
+                label_candidate = str(classification.get('classification', 'classification failed')).strip()
+
+                if label_candidate in ('bug fix', 'not bug fix'):
+                    label = label_candidate
+                    confidence = classification.get('confidence')
+                    explanation = classification.get('explanation')
+                    break
+
+                elif i == self.max_retries - 1 and label_candidate not in ('bug fix', 'not bug fix'):
+                    label = 'not labeled'
 
             commit['classification'] = label
             commit['confidence'] = confidence
             commit['explanation'] = explanation
             print(commit['classification'], commit['confidence'], commit['explanation'])
+
+        #export LLM analysis for troubleshooting purposes
+        # now = datetime.now()
+        # timestamp = now.strftime("%Y-%m-%d-%H-%M-%S")
+        # df = pd.DataFrame(commits)
+        # df.to_csv(f"LLM_results{timestamp}.csv", index = False)
 
         return commits
 
