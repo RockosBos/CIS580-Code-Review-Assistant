@@ -1,0 +1,19 @@
+File,Bug Density
+templates\show_results.html,0.2
+templates\select_repo.html,0.14285714285714285
+main.py,0.08333333333333333
+.gitignore,0.0
+Results.py,0.0
+data\validation_data.csv,0.0
+labeled_results.csv,0.0
+labeled_results1.csv,0.0
+initial_results1.csv,0.0
+initial_results.csv,0.0
+output.csv,0.0
+llm_interface.py,0.0
+output1.csv,0.0
+repository_interface.py,0.0
+static\css\styles.css,0.0
+requirements.txt,0.0
+templates\index.html,0.0
+statisical_interface.py,0.0

@@ -4,6 +4,15 @@
 	{% with repo = request.args.get("repository_url") %}
 	<h1>Results from {{ repo }}</h1>
 	{% endwith %}
-	<p>{{resultData[0].getFile() + " | " + resultData[0].getDensity()}}</p>
-	<button onclick="">Generate CSV Report</button>
+	<table>
+		{% for i in resultData %}
+		<tr>
+			<td>{{i.getFile()}}</td>
+			<td>{{i.getDensity()}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	<form method="post">
+		<button type="submit" name="genCSVButton">Generate CSV Report</button>
+	</form>
 </div>
