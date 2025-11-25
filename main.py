@@ -7,6 +7,7 @@ from werkzeug.utils import redirect
 from llm_interface import LLMInterface
 from repository_interface import RepoInterface
 from statisical_interface import StatisticsInterface
+from Results import Results
 
 #safety measure to minimize PyDriller errors during processing
 os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
@@ -29,6 +30,8 @@ llm_interface = LLMInterface()
 #initialize llm interfacing
 statistical_interface = StatisticsInterface()
 
+resultList = list()
+
 #TODO Home Route
 @app.route('/')
 def home():
@@ -39,7 +42,6 @@ def home():
 def select_repo():
     if request.method == 'POST':
         # TODO - ideally validate REPO HERE if time permits
-        flash('Repository processing is underway, please do not exit or refresh the page.')
         repo_url = request.form.get('repository_url')
         print(f' Select_repo: {repo_url}')
         if repo_url is None:
@@ -47,9 +49,15 @@ def select_repo():
             return redirect(url_for('select_repo'))
         else:
             print('It worked!')
+            
             commits = repository_interface.retrieve_repository(repo_url)
             classification_results = llm_interface.process_commits(commits)
             statistical_results = statistical_interface.analyze_results(classification_results)
+            
+            result = Results(statistical_results["filename"].values[0], statistical_results["bug_density"].values[0])
+            resultList.append(result)
+            print(result.getFile() + " : " + result.getDensity())
+
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
@@ -57,9 +65,7 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
-    return render_template('show_results.html')
-
-# 'C:/Users/Owner/PycharmProjects/CIS580-Code-Review-Assistant'
+    return render_template('show_results.html', resultData=resultList)
 
 if __name__ == '__main__':
     app.run(debug = True, port = 8080)

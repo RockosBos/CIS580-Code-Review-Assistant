@@ -1,3 +1,9 @@
 {% include "header.html" %}
 
-<p>{{ repository_url }} </p>
+<div>
+	{% with repo = request.args.get("repository_url") %}
+	<h1>Results from {{ repo }}</h1>
+	{% endwith %}
+	<p>{{resultData[0].getFile() + " | " + resultData[0].getDensity()}}</p>
+	<button onclick="">Generate CSV Report</button>
+</div>

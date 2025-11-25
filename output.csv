@@ -1,0 +1,2 @@
+index,filename,commit_count,last_commit_date,lines,file_deleted,file_added,bug_fix_commits,is_not_labeled,bug_density,failed_classification_density
+0,BugFile.cs,2,2025-11-11 21:57:23-05:00,28,1,17,1,0,0.5,0.0
