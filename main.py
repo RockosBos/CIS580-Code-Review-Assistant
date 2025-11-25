@@ -30,6 +30,8 @@ llm_interface = LLMInterface()
 #initialize llm interfacing
 statistical_interface = StatisticsInterface()
 
+resultList = list()
+
 #TODO Home Route
 @app.route('/')
 def home():
@@ -51,6 +53,10 @@ def select_repo():
             commits = repository_interface.retrieve_repository(repo_url)
             classification_results = llm_interface.process_commits(commits)
             statistical_results = statistical_interface.analyze_results(classification_results)
+            
+            result = Results(statistical_results["filename"].values[0], statistical_results["bug_density"].values[0])
+            resultList.append(result)
+            print(result.getFile() + " : " + result.getDensity())
 
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
@@ -59,8 +65,7 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
-    print(Results.result)
-    return render_template('show_results.html', resultData=Results.result)
+    return render_template('show_results.html', resultData=resultList)
 
 if __name__ == '__main__':
     app.run(debug = True, port = 8080)

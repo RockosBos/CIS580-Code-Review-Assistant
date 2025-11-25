@@ -1,6 +1,14 @@
 class Results:
 
-	result = ""
+	fileName = ""
+	bugDensity = 0.0
 
-	def loadResults(self, results):
-		self.result = results
+	def __init__(self, file, density):
+		self.fileName = file
+		self.bugDensity = density
+
+	def getFile(self):
+		return str(self.fileName)
+	
+	def getDensity(self):
+		return str(self.bugDensity)
