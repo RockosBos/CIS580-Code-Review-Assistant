@@ -9,6 +9,9 @@ from repository_interface import RepoInterface
 from statisical_interface import StatisticsInterface
 from Results import Results
 
+import csv
+import requests
+
 #safety measure to minimize PyDriller errors during processing
 os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
 
@@ -54,10 +57,11 @@ def select_repo():
             classification_results = llm_interface.process_commits(commits)
             statistical_results = statistical_interface.analyze_results(classification_results)
             
-            result = Results(statistical_results["filename"].values[0], statistical_results["bug_density"].values[0])
-            resultList.append(result)
-            print(result.getFile() + " : " + result.getDensity())
-
+            resultList.clear()
+            for i in statistical_results.itertuples(index=False):
+                result = Results(i.filename, i.bug_density)
+                resultList.append(result)
+                
             return redirect(url_for('show_results', repository_url=repo_url))
     return render_template('select_repo.html')
 
@@ -65,7 +69,17 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
-    return render_template('show_results.html', resultData=resultList)
+    if request.method == "POST":
+        if 'genCSVButton' in request.form:
+            with open('results.csv', 'w', newline='') as f:
+                fieldNames = ["File", "Bug Density"]
+                writer = csv.DictWriter(f, fieldnames=fieldNames)
+                writer.writeheader()
+                for i in resultList:
+                    writer.writerow({"File": i.getFile(), "Bug Density": i.getDensity()})
+            return render_template('show_results.html', resultData=resultList)
+    else:        
+    	return render_template('show_results.html', resultData=resultList)
 
 if __name__ == '__main__':
     app.run(debug = True, port = 8080)
