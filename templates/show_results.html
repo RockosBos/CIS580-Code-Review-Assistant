@@ -4,15 +4,40 @@
 	{% with repo = request.args.get("repository_url") %}
 	<h1>Results from {{ repo }}</h1>
 	{% endwith %}
+
+	<h2>Recent Files with Bugs</h2>
 	<table>
+		<tr>
+			<td>File Name</td>
+			<td>Bug Density</td>
+			<td>Timestamp</td>
+		</tr>
+		{% for i in tsData %}
+		<tr>
+			<td>{{i.getFile()}}</td>
+			<td>{{i.getDensity()}}</td>
+			<td>{{i.getLastCommitDate()}}</td>
+		</tr>
+		{% endfor %}
+	</table>
+
+	<h2>Most Commonly affected bug files</h2>
+	<table>
+		<tr>
+			<td>File Name</td>
+			<td>Bug Density</td>
+			<td>Timestamp</td>
+		</tr>
 		{% for i in resultData %}
 		<tr>
 			<td>{{i.getFile()}}</td>
 			<td>{{i.getDensity()}}</td>
+			<td>{{i.getLastCommitDate()}}</td>
 		</tr>
 		{% endfor %}
 	</table>
 	<form method="post">
-		<button type="submit" name="genCSVButton">Generate CSV Report</button>
+		<button type="submit" class='btn btn-primary btn-med px-4 me-sm-3 accent-color button-border' name="genCSVButton">Generate CSV Report</button>
+		<button type='submit' class='btn btn-primary btn-med px-4 me-sm-3 accent-color button-border' name='ReturnToRepoSelectButton'>Return to Repo Select</button>
 	</form>
 </div>
