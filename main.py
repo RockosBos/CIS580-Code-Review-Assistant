@@ -38,6 +38,7 @@ densityList = list()
 TSList = list()
 filteredDensityList = list()
 filteredTSList = list()
+most_buggy_files = list()
 
 #TODO Home Route
 @app.route('/')
@@ -95,9 +96,14 @@ def show_results():
 				iter = iter + 1
 			else:
 				break
+
+		most_buggy_files = [f for f in resultList if float(f.getDensity()) > 0.25]
+		top_density_results = sorted(most_buggy_files, key=lambda f: float(f.getDensity()), reverse = True)
+
 	for i in TSList:
 		print(i.getFile(), i.getDensity())
-	return render_template('show_results.html', resultData=resultList, tsData=TSList)
+
+	return render_template('show_results.html', resultData=resultList, tsData=TSList, top_density_results = top_density_results)
 
 if __name__ == '__main__':
 	app.run(debug = True, port = 8080)
