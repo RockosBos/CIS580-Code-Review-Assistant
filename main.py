@@ -82,13 +82,13 @@ def show_results():
 				writer = csv.DictWriter(f, fieldnames=field_names)
 				writer.writeheader()
 				for i in result_list:
-					writer.writerow({"File": i.getFile(), "Bug Density": i.getDensity(), "Last Commit Date":i.getLastCommitDate()})
+					writer.writerow({"File": i.get_file(), "Bug Density": i.get_density(), "Last Commit Date":i.get_last_commit_date()})
 			return render_template('show_results.html', resultData=result_list, tsData=ts_list)
 		if 'ReturnToRepoSelectButton' in request.form:
 			return render_template('select_repo.html')
 	else:        
 		ts_list = sorted(result_list, key=operator.attrgetter('lastEdit'), reverse=True)
-		filtered_ts_list = [f for f in ts_list if (f.getDensity() != "0.0")]
+		filtered_ts_list = [f for f in ts_list if (f.get_density() != "0.0")]
 		ts_list.clear()
 		iter = 0
 		for i in filtered_ts_list:
@@ -98,11 +98,11 @@ def show_results():
 			else:
 				break
 
-		most_buggy_files = [f for f in result_list if float(f.getDensity()) > 0.25]
-		top_density_results = sorted(most_buggy_files, key=lambda f: float(f.getDensity()), reverse = True)
+		most_buggy_files = [f for f in result_list if float(f.get_density()) > 0.25]
+		top_density_results = sorted(most_buggy_files, key=lambda f: float(f.get_density()), reverse = True)
 
 	for i in ts_list:
-		print(i.getFile(), i.getDensity())
+		print(i.get_file(), i.get_density())
 
 	return render_template('show_results.html', resultData=result_list, tsData=ts_list, top_density_results = top_density_results)
 

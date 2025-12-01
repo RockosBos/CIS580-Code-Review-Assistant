@@ -10,10 +10,10 @@ class Results:
 		self.last_edit = recent_commit_date
 
 	def get_file(self):
-		return str(self.fileName)
+		return str(self.file_name)
 	
 	def get_density(self):
-		return str(self.bugDensity)
+		return str(self.bug_density)
 	
 	def get_last_commit_date(self):
-		return str(self.lastEdit)
+		return str(self.last_edit)
