@@ -14,9 +14,9 @@
 		</tr>
 		{% for i in tsData %}
 		<tr>
-			<td>{{i.getFile()}}</td>
-			<td>{{i.getDensity()}}</td>
-			<td>{{i.getLastCommitDate()}}</td>
+			<td>{{i.get_file()}}</td>
+			<td>{{i.get_density()}}</td>
+			<td>{{i.get_last_commit_date()}}</td>
 		</tr>
 		{% endfor %}
 	</table>
@@ -32,8 +32,8 @@
 
 		{% for i in top_density_results %}
 		<tr>
-			<td>{{i.getFile()}}</td>
-			<td>{{i.getDensity()}}</td>
+			<td>{{i.get_file()}}</td>
+			<td>{{i.get_density()}}</td>
 		</tr>
 		{% endfor %}
 	</table>
