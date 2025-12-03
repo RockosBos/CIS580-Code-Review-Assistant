@@ -14,28 +14,33 @@
 		</tr>
 		{% for i in tsData %}
 		<tr>
-			<td>{{i.getFile()}}</td>
-			<td>{{i.getDensity()}}</td>
-			<td>{{i.getLastCommitDate()}}</td>
+			<td>{{i.get_file()}}</td>
+			<td>{{i.get_density()}}</td>
+			<td>{{i.get_last_commit_date()}}</td>
 		</tr>
 		{% endfor %}
 	</table>
 
-	<h2>Most Commonly affected bug files</h2>
+	<h2>Most Commonly Affected Bug Files</h2>
+	{% if top_density_results %}
 	<table>
 		<tr>
 			<td>File Name</td>
 			<td>Bug Density</td>
 			<td>Timestamp</td>
 		</tr>
-		{% for i in resultData %}
+
+		{% for i in top_density_results %}
 		<tr>
-			<td>{{i.getFile()}}</td>
-			<td>{{i.getDensity()}}</td>
-			<td>{{i.getLastCommitDate()}}</td>
+			<td>{{i.get_file()}}</td>
+			<td>{{i.get_density()}}</td>
 		</tr>
 		{% endfor %}
 	</table>
+	{% else %}
+	<p>No files have been identified with bug density > .25</p>
+	{% endif %}
+
 	<form method="post">
 		<button type="submit" class='btn btn-primary btn-med px-4 me-sm-3 accent-color button-border' name="genCSVButton">Generate CSV Report</button>
 		<button type='submit' class='btn btn-primary btn-med px-4 me-sm-3 accent-color button-border' name='ReturnToRepoSelectButton'>Return to Repo Select</button>

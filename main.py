@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, get_flashed_messages, url_for
+from flask import Flask, render_template, request, flash, get_flashed_messages, url_for, make_response
 from flask_bootstrap import Bootstrap5
 
 import os
@@ -11,6 +11,7 @@ from Results import Results
 
 import csv
 import operator
+from io import StringIO
 
 #safety measure to minimize PyDriller errors during processing
 os.environ['GIT_LFS_SKIP_SMUDGE'] = '1'
@@ -33,11 +34,12 @@ llm_interface = LLMInterface()
 #initialize llm interfacing
 statistical_interface = StatisticsInterface()
 
-resultList = list()
-densityList = list()
-TSList = list()
-filteredDensityList = list()
-filteredTSList = list()
+result_list = list()
+density_list = list()
+ts_list = list()
+filtered_density_list = list()
+filtered_ts_list = list()
+most_buggy_files = list()
 
 #TODO Home Route
 @app.route('/')
@@ -61,10 +63,10 @@ def select_repo():
 			classification_results = llm_interface.process_commits(commits)
 			statistical_results = statistical_interface.analyze_results(classification_results)
 			
-			resultList.clear()
+			result_list.clear()
 			for i in statistical_results.itertuples(index=False):
 				result = Results(i.filename, i.bug_density, i.last_commit_date)
-				resultList.append(result)
+				result_list.append(result)
 
 			return redirect(url_for('show_results', repository_url=repo_url))
 	return render_template('select_repo.html')
@@ -76,28 +78,33 @@ def show_results():
 	if request.method == "POST":
 		if 'genCSVButton' in request.form:
 			with open('results.csv', 'w', newline='') as f:
-				fieldNames = ["File", "Bug Density", "Last Commit Date"]
-				writer = csv.DictWriter(f, fieldnames=fieldNames)
+				field_names = ["File", "Bug Density", "Last Commit Date"]
+				writer = csv.DictWriter(f, fieldnames=field_names)
 				writer.writeheader()
-				for i in resultList:
-					writer.writerow({"File": i.getFile(), "Bug Density": i.getDensity(), "Last Commit Date":i.getLastCommitDate()})
-			return render_template('show_results.html', resultData=resultList, tsData=TSList)
+				for i in result_list:
+					writer.writerow({"File": i.get_file(), "Bug Density": i.get_density(), "Last Commit Date":i.get_last_commit_date()})
+			return render_template('show_results.html', resultData=result_list, tsData=ts_list)
 		if 'ReturnToRepoSelectButton' in request.form:
 			return render_template('select_repo.html')
 	else:        
-		TSList = sorted(resultList, key=operator.attrgetter('lastEdit'), reverse=True)
-		filteredTSList = [f for f in TSList if (f.getDensity() != "0.0")]
-		TSList.clear()
+		ts_list = sorted(result_list, key=operator.attrgetter('last_edit'), reverse=True)
+		filtered_ts_list = [f for f in ts_list if (f.get_density() != "0.0")]
+		ts_list.clear()
 		iter = 0
-		for i in filteredTSList:
-			if(iter < 5):
-				TSList.append(i)
+		for i in filtered_ts_list:
+			if iter < 5:
+				ts_list.append(i)
 				iter = iter + 1
 			else:
 				break
-	for i in TSList:
-		print(i.getFile(), i.getDensity())
-	return render_template('show_results.html', resultData=resultList, tsData=TSList)
+
+		most_buggy_files = [f for f in result_list if float(f.get_density()) > 0.25]
+		top_density_results = sorted(most_buggy_files, key=lambda f: float(f.get_density()), reverse = True)
+
+	for i in ts_list:
+		print(i.get_file(), i.get_density())
+
+	return render_template('show_results.html', resultData=result_list, tsData=ts_list, top_density_results = top_density_results)
 
 if __name__ == '__main__':
 	app.run(debug = True, port = 8080)

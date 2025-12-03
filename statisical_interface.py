@@ -21,14 +21,17 @@ class StatisticsInterface:
         df['is_bug_fix'] = df['classification'].eq('bug fix').astype(int)
         df['is_not_labeled'] = df['classification'].eq('not labeled').astype(int)
 
-        # non-code files are being flagged as bug fixes due to the commit messages - exclude these files by setting is_bug_fix = 0
-        drop_extensions = ('.gitignore', '.suo', '.backup', '.png', '.jpg', '.jpeg', '.meta', '.settings',
-                           '.prefab', '.unity', '.wav', '.asset', '.fbx', '.bin', '.zip', '.pak',
-                           '.dll', '.exe', '.tiff', '.tif', '.mp4', '.mp3', '.mov', '.info')
+        # help ensure filename matching by formatting the names
+        filename_series = df['filename'].fillna('').astype(str).str.strip().str.lower()
 
-        filename_series = df['filename'].astype(str).str.lower()
-        drop_mask = filename_series.str.endswith(drop_extensions, na = False)
-        df.loc[drop_mask, 'is_bug_fix'] = 0
+        # isolate file extensions to assist with matching
+        df['ext'] = filename_series.str.extract(r'(\.[^.\\]+(?:\.[^.\\]+)*)$', expand=False)
+
+        keep_extensions = ('.py', '.java', '.class', '.jar', '.c', '.cpp', '.h', '.hpp', '.hxx', '.html', '.htm',
+                           '.css', '.js', '.php', '.cs', '.swift', '.vb', '.sh', '.pl', '.go', '.rb')
+
+        keep_mask = df['ext'].isin(keep_extensions)
+        df.loc[~keep_mask, 'is_bug_fix'] = 0
 
         aggregate_result = df.groupby('filename', as_index=False).agg({
             'hash': 'count',
