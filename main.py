@@ -75,6 +75,7 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
+	global result_list, ts_list
 	if request.method == "POST":
 		if 'genCSVButton' in request.form:
 			with open('results.csv', 'w', newline='') as f:
