@@ -87,7 +87,7 @@ def show_results():
 		if 'ReturnToRepoSelectButton' in request.form:
 			return render_template('select_repo.html')
 	else:        
-		ts_list = sorted(result_list, key=operator.attrgetter('lastEdit'), reverse=True)
+		ts_list = sorted(result_list, key=operator.attrgetter('last_edit'), reverse=True)
 		filtered_ts_list = [f for f in ts_list if (f.get_density() != "0.0")]
 		ts_list.clear()
 		iter = 0
