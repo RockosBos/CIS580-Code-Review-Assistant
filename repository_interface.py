@@ -12,7 +12,6 @@ class RepoInterface:
         pass
 
     def retrieve_repository(self, repository_url):
-        # TODO 
         commits = []
         print(f'Retrieve repo: {repository_url}')
         try:

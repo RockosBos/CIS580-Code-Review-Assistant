@@ -40,6 +40,7 @@ ts_list = list()
 filtered_density_list = list()
 filtered_ts_list = list()
 most_buggy_files = list()
+top_density_results = list()
 
 #TODO Home Route
 @app.route('/')
@@ -75,7 +76,7 @@ def select_repo():
 #TODO page should include info from statistics
 @app.route('/results', methods = ['GET', 'POST'])
 def show_results():
-	global result_list, ts_list
+	global result_list, ts_list, top_density_results
 	if request.method == "POST":
 		if 'genCSVButton' in request.form:
 			with open('results.csv', 'w', newline='') as f:
@@ -84,7 +85,7 @@ def show_results():
 				writer.writeheader()
 				for i in result_list:
 					writer.writerow({"File": i.get_file(), "Bug Density": i.get_density(), "Last Commit Date":i.get_last_commit_date()})
-			return render_template('show_results.html', resultData=result_list, tsData=ts_list)
+			return render_template('show_results.html', resultData=result_list, tsData=ts_list, top_density_results = top_density_results)
 		if 'ReturnToRepoSelectButton' in request.form:
 			return render_template('select_repo.html')
 	else:        
