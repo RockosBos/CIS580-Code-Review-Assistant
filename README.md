@@ -20,6 +20,6 @@ This is a Code Review Assistant tool that can proactively determine project file
 
 5. Finally you are ready to run the application.
     a. `python main.py`
-    b. Navigate to http://127.0.0.1:8080/on your preferred browser.
+    b. Navigate to http://127.0.0.1:8080/ on your preferred browser.
     c. Click Select a repository and enter a local or remote repository in the following box.
     d. You can now view your results or save your results to the results.csv file.
